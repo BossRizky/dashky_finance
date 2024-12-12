@@ -49,7 +49,7 @@ class _LoginViewState extends State<LoginView> {
 
     if (user != null) {
       // Navigasi ke halaman Dashboard jika login berhasil
-      Get.offAll(() => const DashboardView());
+      Get.to(() => const DashboardView());
     } else {
       // Tampilkan pesan error jika login gagal
       ScaffoldMessenger.of(context).showSnackBar(
@@ -119,7 +119,8 @@ class _LoginViewState extends State<LoginView> {
                     decoration: InputDecoration(
                       hintText: 'Kata Sandi',
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 18.0),
+                      contentPadding:
+                          const EdgeInsets.symmetric(vertical: 18.0),
                       hintStyle: const TextStyle(fontSize: 14),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -142,7 +143,9 @@ class _LoginViewState extends State<LoginView> {
                 // Tombol "Masuk" untuk login
                 Buttonglobal(
                   buttonText: isLoading ? 'Loading...' : 'Masuk',
-                  onTap: isLoading ? null : _login, // Nonaktifkan tombol saat loading
+                  onTap: isLoading
+                      ? null
+                      : _login, // Nonaktifkan tombol saat loading
                 ),
                 const SizedBox(height: 25),
 
