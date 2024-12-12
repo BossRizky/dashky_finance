@@ -1,0 +1,36 @@
+name: dashky_finance
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  get: ^4.6.6
+  flutter_svg: ^2.0.14 # Menambahkan dependensi flutter_svg
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/logo.png
+    - assets/iklan1.png
+    - assets/logos.png
+    - assets/facebook.svg
+    - assets/google.svg
+    - assets/instagram.svg
+    - assets/iklan2.png
+    - assets/iklan3.png
+    - assets/modal.png
+    - assets/berita1.png
+    - assets/berita2.png
+    - assets/profile.jpeg
