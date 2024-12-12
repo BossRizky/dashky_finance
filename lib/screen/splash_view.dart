@@ -4,7 +4,7 @@ import 'package:dashky_finance/screen/login_view.dart';
 import 'package:flutter/material.dart';
 
 class SplashView extends StatefulWidget {
-  const SplashView({super.key});
+  const SplashView({super.key}); //
 
   @override
   _SplashViewState createState() => _SplashViewState();
@@ -30,8 +30,10 @@ class _SplashViewState extends State<SplashView> {
             // Logo
             Image.asset(
               'assets/logo.png', // Ganti dengan path logo Anda
-              width: 300, // Ukuran logo lebih besar (sesuaikan sesuai kebutuhan)
-              height: 300, // Ukuran logo lebih besar (sesuaikan sesuai kebutuhan)
+              width:
+                  300, // Ukuran logo lebih besar (sesuaikan sesuai kebutuhan)
+              height:
+                  300, // Ukuran logo lebih besar (sesuaikan sesuai kebutuhan)
             ),
             const SizedBox(height: 20), // Space between logo and text
             // Text for version and credit
@@ -44,7 +46,8 @@ class _SplashViewState extends State<SplashView> {
                     color: Colors.grey[600],
                   ),
                 ),
-                const SizedBox(height: 5), // Space between version and credit text
+                const SizedBox(
+                    height: 5), // Space between version and credit text
                 Text(
                   'Powered by Dashky', // Credit text
                   style: TextStyle(
