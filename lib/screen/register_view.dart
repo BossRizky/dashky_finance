@@ -2,7 +2,8 @@ import 'package:dashky_finance/utils/global.colors.dart';
 import 'package:dashky_finance/widgets/button.global.dart';
 import 'package:dashky_finance/widgets/social.login.dart';
 import 'package:dashky_finance/widgets/text.form.global.dart';
-import 'package:dashky_finance/screen/login_view.dart'; // Import halaman login
+import 'package:dashky_finance/screen/login_view.dart';
+import 'package:dashky_finance/service/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,7 +19,6 @@ class _RegisterViewState extends State<RegisterView> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
 
-  // State untuk mengatur visibilitas password dan konfirmasi password
   bool isPasswordVisible = false;
   bool isConfirmPasswordVisible = false;
 
@@ -28,6 +28,45 @@ class _RegisterViewState extends State<RegisterView> {
     passwordController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  // Fungsi untuk menampilkan snackbar
+  void _showSnackbar(String title, String message) {
+    Get.snackbar(title, message, snackPosition: SnackPosition.BOTTOM);
+  }
+
+  // Fungsi untuk melakukan registrasi
+  Future<void> _register() async {
+    String email = emailController.text.trim();
+    String password = passwordController.text.trim();
+    String confirmPassword = confirmPasswordController.text.trim();
+
+    // Validasi input
+    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      _showSnackbar("Error", "Semua kolom wajib diisi");
+      return;
+    }
+
+    // Validasi email
+    if (!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(email)) {
+      _showSnackbar("Error", "Email tidak valid");
+      return;
+    }
+
+    // Validasi apakah password dan konfirmasi password cocok
+    if (password != confirmPassword) {
+      _showSnackbar("Error", "Kata sandi tidak cocok");
+      return;
+    }
+
+    // Memanggil UserService untuk melakukan registrasi
+    var user = await UserService.register(email, password);
+    if (user != null) {
+      _showSnackbar("Sukses", "Pendaftaran berhasil");
+      Get.to(() => const LoginView());
+    } else {
+      _showSnackbar("Error", "Pendaftaran gagal");
+    }
   }
 
   @override
@@ -45,7 +84,7 @@ class _RegisterViewState extends State<RegisterView> {
                 Container(
                   alignment: Alignment.center,
                   child: Image.asset(
-                    'assets/logo.png', // Path gambar logo Anda
+                    'assets/logo.png',
                     width: 150,
                     height: 150,
                   ),
@@ -60,108 +99,40 @@ class _RegisterViewState extends State<RegisterView> {
                   ),
                 ),
                 const SizedBox(height: 15),
-
-                // Email Input
                 TextFormGlobal(
                   controller: emailController,
-                  text: 'Username',
+                  text: 'Email',
                   obscure: false,
                   textInputType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 10),
-
-                // Password Input with Eye Icon
-                Container(
-                  height: 55,
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(6),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                      ),
-                    ],
-                  ),
-                  child: TextFormField(
-                    controller: passwordController,
-                    obscureText: !isPasswordVisible,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                      hintText: 'Kata Sandi',
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 18.0),
-                      hintStyle: const TextStyle(fontSize: 14),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          isPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: GlobalColors.mainColor,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            isPasswordVisible = !isPasswordVisible;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-
-                // Confirm Password Input with Eye Icon
-                Container(
-                  height: 55,
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(6),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                      ),
-                    ],
-                  ),
-                  child: TextFormField(
-                    controller: confirmPasswordController,
-                    obscureText: !isConfirmPasswordVisible,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                      hintText: 'Konfirmasi Kata Sandi',
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 18.0),
-                      hintStyle: const TextStyle(fontSize: 14),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          isConfirmPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: GlobalColors.mainColor,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            isConfirmPasswordVisible = !isConfirmPasswordVisible;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-
-                // Tombol "Daftar" untuk navigasi ke LoginView
-                Buttonglobal(
-                  buttonText: 'Daftar',
-                  onTap: () {
-                    Get.to(() => const LoginView()); // Navigasi ke LoginView
+                _buildPasswordField(
+                  controller: passwordController,
+                  hintText: 'Kata Sandi',
+                  isPasswordVisible: isPasswordVisible,
+                  toggleVisibility: () {
+                    setState(() {
+                      isPasswordVisible = !isPasswordVisible;
+                    });
                   },
                 ),
+                const SizedBox(height: 10),
+                _buildPasswordField(
+                  controller: confirmPasswordController,
+                  hintText: 'Konfirmasi Kata Sandi',
+                  isPasswordVisible: isConfirmPasswordVisible,
+                  toggleVisibility: () {
+                    setState(() {
+                      isConfirmPasswordVisible = !isConfirmPasswordVisible;
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+                Buttonglobal(
+                  buttonText: 'Daftar',
+                  onTap: _register,
+                ),
                 const SizedBox(height: 25),
-
-                // Widget social login dengan teks "or sign up with"
                 SocialLogin(isLogin: false),
               ],
             ),
@@ -178,7 +149,7 @@ class _RegisterViewState extends State<RegisterView> {
             Text("Sudah memiliki akun?"),
             InkWell(
               onTap: () {
-                Get.to(() => const LoginView()); // Navigasi ke LoginView
+                Get.to(() => const LoginView());
               },
               child: Text(
                 'Masuk',
@@ -188,6 +159,44 @@ class _RegisterViewState extends State<RegisterView> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  // Widget untuk membuat field password
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required String hintText,
+    required bool isPasswordVisible,
+    required VoidCallback toggleVisibility,
+  }) {
+    return Container(
+      height: 55,
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(6),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: TextFormField(
+        controller: controller,
+        obscureText: !isPasswordVisible,
+        decoration: InputDecoration(
+          hintText: hintText,
+          border: InputBorder.none,
+          suffixIcon: IconButton(
+            icon: Icon(
+              isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+              color: GlobalColors.mainColor,
+            ),
+            onPressed: toggleVisibility,
+          ),
         ),
       ),
     );

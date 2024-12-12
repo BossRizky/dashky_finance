@@ -49,7 +49,7 @@ class _LoginViewState extends State<LoginView> {
 
     if (user != null) {
       // Navigasi ke halaman Dashboard jika login berhasil
-      Get.to(() => const DashboardView());
+      Get.offAll(() => const DashboardView());
     } else {
       // Tampilkan pesan error jika login gagal
       ScaffoldMessenger.of(context).showSnackBar(
