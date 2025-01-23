@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'dashboard.dart';  // Import the Dashboard screen
-import 'profile.dart';   // Import the Profile screen
-import 'pinjaman.dart';  // Import the Pinjaman page
+import '../service/user_service.dart';
+import 'bayar_page.dart'; // Import the BayarPage screen
+import 'dashboard.dart'; // Import the Dashboard screen
+import 'profile.dart'; // Import the Profile screen
+import 'pinjaman.dart'; // Import the Pinjaman page
+import 'topup.dart'; // Import the TopUpPage screen
+import 'coming.dart'; // Import the ComingPage screen
 
 class Simpanan extends StatefulWidget {
   @override
@@ -11,6 +15,8 @@ class Simpanan extends StatefulWidget {
 class _SimpananState extends State<Simpanan> {
   int _selectedBottomTabIndex = 1; // Set default to Simpanan
   String _selectedSortOption = 'Hari ini'; // Default sort option
+  List<Map<String, dynamic>> _transactionHistory = []; // Transaction history
+  UserService userService = UserService();
 
   void _onBottomTabSelected(int index) {
     setState(() {
@@ -24,25 +30,81 @@ class _SimpananState extends State<Simpanan> {
       // Navigate to Home (Dashboard.dart)
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => DashboardView()), // Navigate to Dashboard
+        MaterialPageRoute(
+            builder: (context) => DashboardView()), // Navigate to Dashboard
       );
     } else if (index == 2) {
       // Navigate to Pinjaman page
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Pinjaman()), // Navigate to PinjamanPage
+        MaterialPageRoute(
+            builder: (context) => Pinjaman()), // Navigate to PinjamanPage
       );
     } else if (index == 3) {
       // Navigate to Profile page (Profile.dart)
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => ProfileScreen()), // Navigate to Profile
+        MaterialPageRoute(
+            builder: (context) => ProfileScreen()), // Navigate to Profile
       );
     }
   }
 
+  // Function to handle Top Up action
+  void _handleTopUp(double amount) {
+    setState(() {
+      // _balance += amount; // Increase the balance by the top-up amount
+      userService.addBalance(amount);
+      _transactionHistory.add({
+        'type': 'Top Up',
+        'amount': amount,
+        'date': DateTime.now().toString(),
+      });
+    });
+  }
+
+  // Function to handle Bayar (payment) action
+  void _handleBayar(double amount) {
+    setState(() {
+      if (userService.saldo >= amount) {
+        userService.penguranganBalance(
+            amount); // Decrease the balance by the payment amount
+        _transactionHistory.add({
+          'type': 'Bayar',
+          'amount': amount,
+          'date': DateTime.now().toString(),
+        });
+      } else {
+        // Show a message if the balance is insufficient
+        _showInsufficientBalanceDialog();
+      }
+    });
+  }
+
+  // Function to show insufficient balance dialog
+  void _showInsufficientBalanceDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Saldo Tidak Cukup'),
+          content: Text('Saldo Anda tidak cukup untuk melakukan pembayaran.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    print(userService.saldo);
     return Scaffold(
       backgroundColor: Colors.white, // Set background to white
       body: SafeArea(
@@ -107,10 +169,11 @@ class _SimpananState extends State<Simpanan> {
           children: [
             Text(
               'Selamat datang',
-              style: TextStyle(color: Colors.black54), // Darker text for subtitle
+              style:
+                  TextStyle(color: Colors.black54), // Darker text for subtitle
             ),
             Text(
-              'Rizky Eka Adiangoro',
+              'Rizky Eka Adinagoro',
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 24,
@@ -119,15 +182,19 @@ class _SimpananState extends State<Simpanan> {
             ),
             Row(
               children: [
-                Icon(Icons.star, color: Colors.black, size: 16), // Black star icon
+                Icon(Icons.star,
+                    color: Colors.black, size: 16), // Black star icon
                 SizedBox(width: 5),
-                Text('Priority', style: TextStyle(color: Colors.black54)), // Darker text for status
+                Text('Priority',
+                    style: TextStyle(
+                        color: Colors.black54)), // Darker text for status
               ],
             ),
           ],
         ),
         CircleAvatar(
-          backgroundImage: AssetImage('assets/profile.jpeg'), // Load image from assets
+          backgroundImage:
+              AssetImage('assets/profile.jpeg'), // Load image from assets
           radius: 30,
         ),
       ],
@@ -155,7 +222,7 @@ class _SimpananState extends State<Simpanan> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Dashky Finance',
+                'Dashky Financ',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -171,7 +238,7 @@ class _SimpananState extends State<Simpanan> {
           ),
           SizedBox(height: 20),
           Text(
-            'Rp 100.000.000,00', // Change the currency symbol to RP
+            'Rp ${userService.saldo.toStringAsFixed(2)}', // Display updated balance
             style: TextStyle(
               color: Colors.white,
               fontSize: 28,
@@ -232,7 +299,6 @@ class _SimpananState extends State<Simpanan> {
     );
   }
 
-  // A Row with 4 smaller icon boxes for 'Bayar', 'Top Up', 'Scan', 'Laporan'
   Widget _buildIconRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -245,23 +311,54 @@ class _SimpananState extends State<Simpanan> {
     );
   }
 
-  // A smaller icon box with label
   Widget _buildIconButton(IconData icon, String label) {
     return Column(
       children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: Colors.blue[900], // Blue background for icons
-            borderRadius: BorderRadius.circular(8),
+        GestureDetector(
+          onTap: () {
+            if (label == 'Bayar') {
+              // Navigate to BayarPage when 'Bayar' icon is clicked
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => BayarPage()),
+              ).then((amount) {
+                if (amount != null) {
+                  _handleBayar(amount); // Pass the amount to handle the payment
+                }
+              });
+            } else if (label == 'Top Up') {
+              // Navigate to TopUpPage when 'Top Up' icon is clicked
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => TopUpPage()),
+              ).then((amount) {
+                if (amount != null) {
+                  _handleTopUp(amount); // Pass the amount to handle the top-up
+                }
+              });
+            } else if (label == 'Scan' || label == 'Laporan') {
+              // Navigate to ComingPage when 'Scan' or 'Laporan' icon is clicked
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ComingSoonPage()),
+              );
+            }
+          },
+          child: Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.blue[900], // Blue background for icons
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: Colors.white, size: 30), // White icon
           ),
-          child: Icon(icon, color: Colors.white, size: 30), // White icon
         ),
         SizedBox(height: 5),
         Text(
           label,
-          style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
         ),
       ],
     );
@@ -288,7 +385,7 @@ class _SimpananState extends State<Simpanan> {
                   _selectedSortOption,
                   style: TextStyle(color: Colors.black, fontSize: 16),
                 ),
-                PopupMenuButton<String>(
+                PopupMenuButton<String>( 
                   icon: Icon(Icons.arrow_drop_down, color: Colors.black),
                   onSelected: (String value) {
                     setState(() {
@@ -335,7 +432,19 @@ class _SimpananState extends State<Simpanan> {
           ],
         ),
         SizedBox(height: 10),
-        // Add list of transactions here
+        // Display transaction history
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: _transactionHistory.length,
+          itemBuilder: (context, index) {
+            var transaction = _transactionHistory[index];
+            return ListTile(
+              title: Text(transaction['type']),
+              subtitle: Text(transaction['date']),
+              trailing: Text('Rp ${transaction['amount']}'),
+            );
+          },
+        ),
       ],
     );
   }

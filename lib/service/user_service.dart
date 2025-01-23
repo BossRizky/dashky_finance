@@ -1,19 +1,48 @@
 import 'package:dashky_finance/models/user_models.dart';
+import 'package:get_storage/get_storage.dart';
 
 class UserService {
-  // Database sementara untuk menyimpan pengguna
   static List<User> _users = [];
   static User? _currentUser;
+  double _balance = 0.00; // Initial balance
+  final box = GetStorage();
+
+  double get saldo {
+    _balance = box.read("saldo") ?? 0.0; // Berikan nilai default 0.0 jika null
+    return _balance;
+  }
+
+  addBalance(double amount) {
+    _balance = _balance + amount;
+    box.write('saldo', _balance);
+    print("saldo $_balance");
+  }
+
+  penguranganBalance(double amount) {
+    _balance = _balance - amount;
+    print("saldo $_balance");
+  }
+
+  // Email dan password untuk admin hardcoded
+  static const String adminEmail = 'dashky@gmail.com';
+  static const String adminPassword = '5754';
 
   // Fungsi untuk login
   static Future<User?> login(String email, String password) async {
-    // Cari pengguna di daftar yang sudah ada
+    // Cek apakah login sebagai admin
+    if (email == adminEmail && password == adminPassword) {
+      _currentUser = User(id: '1', email: adminEmail, password: adminPassword);
+      return _currentUser;
+    }
+
+    // Cari pengguna biasa
     for (var user in _users) {
       if (user.email == email && user.password == password) {
-        _currentUser = user; // Simpan pengguna yang berhasil login
+        _currentUser = user;
         return user;
       }
     }
+
     return null; // Jika tidak ditemukan
   }
 
@@ -34,29 +63,25 @@ class UserService {
     // Simulasi ID unik (misalnya dengan nomor urut)
     String newUserId = (_users.length + 1).toString();
     User newUser = User(id: newUserId, email: email, password: password);
-    
+
     _users.add(newUser); // Menambahkan pengguna baru ke dalam "database" sementara
     _currentUser = newUser; // Simpan data pengguna yang baru saja terdaftar
     return newUser;
   }
 
-  // Fungsi untuk mendapatkan data pengguna yang sedang login
-  static Future<User?> getUser() async {
-    return _currentUser; // Kembalikan data pengguna yang sedang login
-  }
-
-  // Fungsi untuk menghapus data pengguna (logout)
-  static Future<void> logout() async {
-    _currentUser = null; // Hapus data pengguna yang sedang login
-  }
-
-  // Fungsi untuk memvalidasi format email
   static bool isValidEmail(String email) {
     final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return regex.hasMatch(email);
   }
 
-  // Fungsi untuk mendapatkan semua pengguna (untuk testing atau pengelolaan)
+  static Future<User?> getUser() async {
+    return _currentUser;
+  }
+
+  static Future<void> logout() async {
+    _currentUser = null; // Hapus data pengguna yang sedang login
+  }
+
   static List<User> getAllUsers() {
     return _users;
   }

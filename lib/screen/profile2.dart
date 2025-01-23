@@ -1,44 +1,45 @@
-import 'package:flutter/material.dart';
-import 'coming.dart'; // Import the ComingSoonPage screen
-import 'dashboard.dart'; // Import the dashboard screen
-import 'simpanan.dart'; // Import the simpanan screen
-import 'pinjaman.dart'; // Import the pinjaman screen (you need to create this file if it doesn't exist)
+import 'package:dashky_finance/screen/dashboard2.dart';
+import 'package:dashky_finance/screen/laporanpage.dart';
+import 'package:dashky_finance/screen/listnasabah.dart';
+import 'package:flutter/material.dart'; // Import the dashboard screen
 import 'tentang.dart'; // Import the tentang page
-import 'sk.dart'; // Import the sk page for Syarat & Ketentuan
-import 'privasi.dart'; // Import the kebijakan privasi page
+import 'sk.dart'; // Import the Syarat & Ketentuan page
+import 'privasi.dart'; // Import the Kebijakan Privasi page
+import 'coming.dart'; // Import the ComingSoon page
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen2 extends StatefulWidget {
   @override
-  _ProfileScreenState createState() => _ProfileScreenState();
+  _ProfileScreen2State createState() => _ProfileScreen2State();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreen2State extends State<ProfileScreen2> {
   int _selectedBottomTabIndex = 3; // Profile tab is selected by default
 
   // Handle bottom navigation tab selection
   void _onBottomTabSelected(int index) {
-    setState(() {
-      _selectedBottomTabIndex = index;
-    });
-
-    // Navigate to different screens based on the selected index
     if (index == 0) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => DashboardView()),
+        MaterialPageRoute(builder: (context) => Dashboard2Page()),
       );
     } else if (index == 1) {
+      // Navigate to List Nasabah
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Simpanan()),
+        MaterialPageRoute(builder: (context) => ListNasabahPage()),
       );
     } else if (index == 2) {
+      // Navigate to Laporan
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Pinjaman()), // Navigate to Pinjaman screen
+        MaterialPageRoute(builder: (context) => ListLaporanPage()),
       );
+    } else if (index == 3) {
+      // Stay on Profile screen
+      setState(() {
+        _selectedBottomTabIndex = index;
+      });
     }
-    // Add more navigation logic for other tabs if needed
   }
 
   @override
@@ -109,7 +110,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: 'Ganti Info Profil', // Change Profile Info
               trailing: Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
-                // Navigate to the ComingSoonPage
+                // Navigate to Coming Soon page for "Ganti Info Profil"
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ComingSoonPage()),
@@ -121,7 +122,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: 'Ganti Password', // Change Password
               trailing: Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
-                // Navigate to the ComingSoonPage
+                // Navigate to Coming Soon page for "Ganti Password"
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ComingSoonPage()),
@@ -172,7 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: 'Bagikan Aplikasi Ini', // Share This App
               trailing: Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
-                // Navigate to the ComingSoonPage
+                // Navigate to Coming Soon page for "Bagikan Aplikasi Ini"
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ComingSoonPage()),
@@ -195,12 +196,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet),
-            label: 'Simpanan',
+            icon: Icon(Icons.list_alt),
+            label: 'List Nasabah',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.monetization_on),
-            label: 'Pinjaman',
+            icon: Icon(Icons.article),
+            label: 'Laporan',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

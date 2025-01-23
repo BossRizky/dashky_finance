@@ -1,6 +1,6 @@
 name: dashky_finance
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.0.0+1
 
@@ -12,7 +12,11 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   get: ^4.6.6
-  flutter_svg: ^2.0.14 # Menambahkan dependensi flutter_svg
+  flutter_svg: ^2.0.14
+  get_storage: ^2.1.1
+  shared_preferences: ^2.3.5
+  pdf: ^3.6.0          # Menambahkan dependensi pdf untuk membuat PDF
+  printing: ^5.3.0      # Menambahkan dependensi printing untuk mencetak PDF
 
 dev_dependencies:
   flutter_test:

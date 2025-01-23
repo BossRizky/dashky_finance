@@ -30,36 +30,30 @@ class _RegisterViewState extends State<RegisterView> {
     super.dispose();
   }
 
-  // Fungsi untuk menampilkan snackbar
   void _showSnackbar(String title, String message) {
     Get.snackbar(title, message, snackPosition: SnackPosition.BOTTOM);
   }
 
-  // Fungsi untuk melakukan registrasi
   Future<void> _register() async {
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
     String confirmPassword = confirmPasswordController.text.trim();
 
-    // Validasi input
     if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       _showSnackbar("Error", "Semua kolom wajib diisi");
       return;
     }
 
-    // Validasi email
     if (!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(email)) {
       _showSnackbar("Error", "Email tidak valid");
       return;
     }
 
-    // Validasi apakah password dan konfirmasi password cocok
     if (password != confirmPassword) {
       _showSnackbar("Error", "Kata sandi tidak cocok");
       return;
     }
 
-    // Memanggil UserService untuk melakukan registrasi
     var user = await UserService.register(email, password);
     if (user != null) {
       _showSnackbar("Sukses", "Pendaftaran berhasil");
@@ -164,7 +158,6 @@ class _RegisterViewState extends State<RegisterView> {
     );
   }
 
-  // Widget untuk membuat field password
   Widget _buildPasswordField({
     required TextEditingController controller,
     required String hintText,

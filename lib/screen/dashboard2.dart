@@ -1,21 +1,21 @@
 import 'dart:async';
+import 'package:dashky_finance/screen/profile2.dart';
+import 'package:dashky_finance/screen/splash_view.dart';
+import 'package:dashky_finance/screen/listnasabah.dart'; // Import ListNasabahPage
+import 'package:dashky_finance/screen/laporanpage.dart'; // Import LaporanPage
 import 'package:flutter/material.dart';
-import 'profile.dart'; // Pastikan path ini benar
-import 'simpanan.dart'; // Pastikan path ini benar
-import 'pinjaman.dart'; // Pastikan PinjamanPage ada
-import 'splash_view.dart';
 
-class DashboardView extends StatefulWidget {
-  const DashboardView({super.key});
+class Dashboard2Page extends StatefulWidget {
+  const Dashboard2Page({super.key});
 
   @override
-  _DashboardViewState createState() => _DashboardViewState();
+  _Dashboard2PageState createState() => _Dashboard2PageState();
 }
 
-class _DashboardViewState extends State<DashboardView> {
+class _Dashboard2PageState extends State<Dashboard2Page> {
   final PageController _pageController = PageController();
-  int _bannerCurrentPage = 0; // Track the current page for the banner
-  int _bottomNavCurrentIndex = 0; // Track the current index for BottomNavigationBar
+  int _bannerCurrentPage = 0;
+  int _bottomNavCurrentIndex = 0;
   Timer? _timer;
 
   final List<String> _bannerImages = [
@@ -54,26 +54,33 @@ class _DashboardViewState extends State<DashboardView> {
     });
   }
 
+  // Update bottom navigation index when an item is clicked
   void _onBottomTabSelected(int index) {
     setState(() {
-      _bottomNavCurrentIndex = index; // Update BottomNavigationBar index
+      _bottomNavCurrentIndex = index; // Update the bottom navigation index
     });
 
-    // Navigate based on the selected index
+    // Navigate to Profile2Page when Profile tab is selected
+    if (index == 3) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ProfileScreen2()),
+      );
+    }
+
+    // Navigate to ListNasabahPage when List Nasabah tab is selected
     if (index == 1) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => Simpanan()),
+        MaterialPageRoute(builder: (context) => ListNasabahPage()), // Navigate to ListNasabahPage
       );
-    } else if (index == 2) {
+    }
+
+    // Navigate to LaporanPage when Laporan tab is selected
+    if (index == 2) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => Pinjaman()),
-      );
-    } else if (index == 3) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ProfileScreen()),
+        MaterialPageRoute(builder: (context) => ListLaporanPage()), // Navigate to LaporanPage
       );
     }
   }
@@ -90,7 +97,13 @@ class _DashboardViewState extends State<DashboardView> {
         actions: [
           IconButton(
             icon: Icon(Icons.article_rounded, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              // Navigate to LaporanPage when icon is clicked
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ListLaporanPage()), // Navigate to LaporanPage
+              );
+            },
           ),
         ],
         leading: Builder(
@@ -118,7 +131,7 @@ class _DashboardViewState extends State<DashboardView> {
                     controller: _pageController,
                     onPageChanged: (index) {
                       setState(() {
-                        _bannerCurrentPage = index; // Update banner page
+                        _bannerCurrentPage = index;
                       });
                     },
                     itemCount: _bannerImages.length,
@@ -223,20 +236,20 @@ class _DashboardViewState extends State<DashboardView> {
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.blue[900],
         unselectedItemColor: Colors.grey,
-        currentIndex: _bottomNavCurrentIndex, // Use the current index for BottomNavigationBar
-        onTap: _onBottomTabSelected, // Handle BottomNavigationBar taps
+        currentIndex: _bottomNavCurrentIndex,
+        onTap: _onBottomTabSelected,
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet),
-            label: 'Simpanan',
+            icon: Icon(Icons.list_alt),
+            label: 'List Nasabah',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.monetization_on),
-            label: 'Pinjaman',
+            icon: Icon(Icons.article),
+            label: 'Laporan',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
@@ -251,6 +264,7 @@ class _DashboardViewState extends State<DashboardView> {
           fontSize: 12,
           fontWeight: FontWeight.normal,
         ),
+        backgroundColor: Colors.white,
       ),
       drawer: Drawer(
         child: ListView(
@@ -267,24 +281,31 @@ class _DashboardViewState extends State<DashboardView> {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.account_balance_wallet),
-              title: Text('Simpanan'),
+              leading: Icon(Icons.home),
+              title: Text('Home'),
               onTap: () {
                 Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.list_alt),
+              title: Text('List Nasabah'),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Simpanan()),
+                  MaterialPageRoute(builder: (context) => ListNasabahPage()),
                 );
               },
             ),
             ListTile(
-              leading: Icon(Icons.monetization_on),
-              title: Text('Pinjaman'),
+              leading: Icon(Icons.article),
+              title: Text('Laporan'),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pop(context); // Close the drawer
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Pinjaman()),
+                  MaterialPageRoute(builder: (context) => ListLaporanPage()), // Navigate to LaporanPage
                 );
               },
             ),
@@ -292,9 +313,10 @@ class _DashboardViewState extends State<DashboardView> {
               leading: Icon(Icons.person),
               title: Text('Profile'),
               onTap: () {
+                Navigator.pop(context); // Close the drawer
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ProfileScreen()),
+                  MaterialPageRoute(builder: (context) => ProfileScreen2()),
                 );
               },
             ),
@@ -315,7 +337,6 @@ class _DashboardViewState extends State<DashboardView> {
   }
 }
 
-// Widget for News Card
 class NewsCard extends StatelessWidget {
   final String image;
   final String title;

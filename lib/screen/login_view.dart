@@ -1,13 +1,13 @@
 import 'package:dashky_finance/models/user_models.dart';
-import 'package:dashky_finance/utils/global.colors.dart';
+import 'package:dashky_finance/screen/dashboard2.dart';
 import 'package:dashky_finance/widgets/button.global.dart';
 import 'package:dashky_finance/widgets/social.login.dart';
 import 'package:dashky_finance/widgets/text.form.global.dart';
-import 'package:dashky_finance/screen/register_view.dart'; // Import halaman register
-import 'package:dashky_finance/screen/dashboard.dart'; // Import halaman dashboard
+import 'package:dashky_finance/screen/register_view.dart';
+import 'package:dashky_finance/screen/dashboard.dart'; // Pastikan ini sudah ada
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:dashky_finance/service/user_service.dart'; // Import UserService
+import 'package:dashky_finance/service/user_service.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -21,7 +21,7 @@ class _LoginViewState extends State<LoginView> {
   final TextEditingController passwordController = TextEditingController();
 
   bool isPasswordVisible = false;
-  bool isLoading = false; // Menambahkan status loading
+  bool isLoading = false;
 
   @override
   void dispose() {
@@ -30,28 +30,28 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
-  // Fungsi login
   void _login() async {
     setState(() {
-      isLoading = true; // Menampilkan loading saat proses login
+      isLoading = true;
     });
 
-    // Ambil email dan password dari inputan
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
 
-    // Panggil UserService untuk autentikasi
     User? user = await UserService.login(email, password);
 
     setState(() {
-      isLoading = false; // Sembunyikan loading setelah proses selesai
+      isLoading = false;
     });
 
     if (user != null) {
-      // Navigasi ke halaman Dashboard jika login berhasil
-      Get.to(() => const DashboardView());
+      // Jika admin login
+      if (email == UserService.adminEmail) {
+        Get.to(() => const Dashboard2Page()); // Halaman admin
+      } else {
+        Get.to(() => const DashboardView()); // Halaman user biasa
+      }
     } else {
-      // Tampilkan pesan error jika login gagal
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Email atau password salah!')),
       );
@@ -73,7 +73,7 @@ class _LoginViewState extends State<LoginView> {
                 Container(
                   alignment: Alignment.center,
                   child: Image.asset(
-                    'assets/logo.png', // Path gambar logo Anda
+                    'assets/logo.png',
                     width: 200,
                     height: 200,
                   ),
@@ -82,14 +82,12 @@ class _LoginViewState extends State<LoginView> {
                 Text(
                   'Login to your Account',
                   style: TextStyle(
-                    color: GlobalColors.textColor,
+                    color: Colors.black,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 15),
-
-                // Username Input
                 TextFormGlobal(
                   controller: emailController,
                   text: 'Username',
@@ -97,8 +95,6 @@ class _LoginViewState extends State<LoginView> {
                   textInputType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 10),
-
-                // Password Input with Eye Icon
                 Container(
                   height: 55,
                   padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -127,7 +123,7 @@ class _LoginViewState extends State<LoginView> {
                           isPasswordVisible
                               ? Icons.visibility
                               : Icons.visibility_off,
-                          color: GlobalColors.mainColor,
+                          color: Colors.blue,
                         ),
                         onPressed: () {
                           setState(() {
@@ -139,17 +135,11 @@ class _LoginViewState extends State<LoginView> {
                   ),
                 ),
                 const SizedBox(height: 10),
-
-                // Tombol "Masuk" untuk login
                 Buttonglobal(
                   buttonText: isLoading ? 'Loading...' : 'Masuk',
-                  onTap: isLoading
-                      ? null
-                      : _login, // Nonaktifkan tombol saat loading
+                  onTap: isLoading ? null : _login,
                 ),
                 const SizedBox(height: 25),
-
-                // Widget social login dengan teks "or sign in with"
                 SocialLogin(isLogin: true),
               ],
             ),
@@ -166,12 +156,12 @@ class _LoginViewState extends State<LoginView> {
             Text("Belum memiliki akun?"),
             InkWell(
               onTap: () {
-                Get.to(() => const RegisterView()); // Navigasi ke RegisterView
+                Get.to(() => const RegisterView());
               },
               child: Text(
                 'Daftar',
                 style: TextStyle(
-                  color: GlobalColors.mainColor,
+                  color: Colors.blue,
                 ),
               ),
             ),

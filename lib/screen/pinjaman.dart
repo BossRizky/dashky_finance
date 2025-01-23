@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'dashboard.dart';  // Import the Dashboard screen
 import 'profile.dart';    // Import the Profile screen
 import 'simpanan.dart';
+import 'bayar_page.dart'; // Import the BayarPage
+import 'pinjam.dart'; // Import the PinjamPage
+import 'coming.dart'; // Import the ComingPage
 
 class Pinjaman extends StatefulWidget {
   @override
@@ -110,7 +113,7 @@ class _PinjamanState extends State<Pinjaman> {
               style: TextStyle(color: Colors.black54), // Darker text for subtitle
             ),
             Text(
-              'Rizky Eka Adiangoro',
+              'Rizky Eka Adinagoro',
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 24,
@@ -228,7 +231,6 @@ class _PinjamanState extends State<Pinjaman> {
             ],
           ),
           SizedBox(height: 20),
-          // New section for loan limit display
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -273,28 +275,55 @@ class _PinjamanState extends State<Pinjaman> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildIconBox(Icons.payment, 'Bayar'),
-        _buildIconBox(Icons.add_circle, 'Pinjam'),
-        _buildIconBox(Icons.qr_code, 'Scan'), // New icon for Scan
-        _buildIconBox(Icons.bar_chart, 'Laporan'), // New icon for Laporan
+        _buildIconBox(Icons.payment, 'Bayar', () {
+          // Navigate to BayarPage
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => BayarPage()),
+          );
+        }),
+        _buildIconBox(Icons.add_circle, 'Pinjam', () {
+          // Navigate to PinjamPage
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LoanApplicationPage()),
+          );
+        }),
+        _buildIconBox(Icons.qr_code, 'Scan', () {
+          // Navigate to ComingPage (Scan)
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ComingSoonPage()),
+          );
+        }),
+        _buildIconBox(Icons.bar_chart, 'Laporan', () {
+          // Navigate to ComingPage (Laporan)
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ComingSoonPage()),
+          );
+        }),
       ],
     );
   }
 
-  Widget _buildIconBox(IconData icon, String label) {
+  Widget _buildIconBox(IconData icon, String label, VoidCallback onPressed) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          width: 60, // Reduced size to fit four icons in a row
-          height: 60,
-          decoration: BoxDecoration(
-            color: Colors.blue[900], // Blue background for icons
-            borderRadius: BorderRadius.circular(8),
+        GestureDetector(
+          onTap: onPressed,
+          child: Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.blue[900], // Blue background for icons
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: Colors.white, size: 40), // White icon
           ),
-          child: Icon(icon, color: Colors.white, size: 40), // White icon
         ),
-        SizedBox(height: 10), // Space between icon and label
+        SizedBox(height: 10),
         Text(
           label,
           style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
